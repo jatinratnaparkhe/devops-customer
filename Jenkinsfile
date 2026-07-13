@@ -10,6 +10,10 @@ pipeline {
         maven 'Maven3'
     }
 
+    environment {
+        IMAGE_NAME = 'jatinratnaparkhe/devops-customer'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -39,6 +43,41 @@ pipeline {
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                bat 'docker build -t %IMAGE_NAME%:%BUILD_NUMBER% .'
+                bat 'docker tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest'
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    bat '''
+                    echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                bat 'docker push %IMAGE_NAME%:%BUILD_NUMBER%'
+                bat 'docker push %IMAGE_NAME%:latest'
+            }
+        }
+
+        stage('Docker Logout') {
+            steps {
+                bat 'docker logout'
             }
         }
     }
