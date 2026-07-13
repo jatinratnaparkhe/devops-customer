@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        timestamps()
+    }
+
     tools {
         jdk 'jdk21'
         maven 'Maven3'
@@ -28,7 +32,7 @@ pipeline {
 
         stage('Package') {
             steps {
-                bat 'mvn clean package'
+                bat 'mvn package -DskipTests'
             }
         }
 
@@ -41,7 +45,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo "Build #${env.BUILD_NUMBER} completed successfully."
         }
 
         failure {
