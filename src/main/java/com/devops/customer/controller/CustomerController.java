@@ -39,4 +39,9 @@ public class CustomerController {
 
         return "Customer deleted successfully.";
     }
+
+    @PutMapping
+    public Customer updateCustomer(@Valid @RequestBody Customer customer) {
+        return service.updateCustomer(customer);
+    }
 }

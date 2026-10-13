@@ -45,4 +45,9 @@ public class CustomerServiceImpl implements CustomerService {
 
         repository.deleteById(id);
     }
+
+    @Override
+    public Customer updateCustomer(Customer customer) {
+        return repository.save(customer);
+    }
 }
